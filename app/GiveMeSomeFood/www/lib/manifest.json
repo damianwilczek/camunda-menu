@@ -1,0 +1,25 @@
+{
+  "lang": "de-EN",
+  "name": "Give me some FOOD!",
+  "short_name": "Give me some FOOD!"
+  "icons": [
+    {
+      "src": "res/logo/logo.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "res/logo/logo_B.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "chrome_related_applications": [{
+    "platform": "web"
+  }, {
+    "platform": "android",
+  }]
+}

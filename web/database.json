@@ -1,0 +1,42 @@
+  {
+    "Location":
+    {
+      "1":
+      {
+        "name": "Joey's Pizza"
+      },
+      "2":
+      {
+        "name": "Markthalle"
+      },
+      "3":
+      {
+        "name": "Tuercke"
+      }
+    },
+    "Food":
+    {
+     "1":
+      {
+        "id": 1,
+        "name": "Mozarela",
+        "location": 1
+      },
+      "2":
+      {
+        "id": 2,
+      "name": "Schinken",
+        "location": 1
+      },
+      "3":
+      {
+        "id": 3,
+        "name": "Vegi",
+        "location": 1
+      }
+    },
+    "time": "14:00",
+    "currentLocationId": 1,
+    "amount": 6,
+    "done": true
+  }

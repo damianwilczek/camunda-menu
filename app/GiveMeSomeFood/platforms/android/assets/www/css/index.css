@@ -30,7 +30,7 @@ body {
     height: 100%;
     margin: 0px;
     padding: 0px;
-    width: 100%;
+    width: 99%;
 }
 
 .datagrid table {
@@ -107,8 +107,8 @@ body {
 
 
 .datagrid .menu img, svg {
-    width: 50%;
-    margin: 23%;
+   /* width: 50%; */
+    margin: 3%;
     height:auto;
 }
 
@@ -182,5 +182,11 @@ body .row {
 
 .modal-content .center {
     width: 170px;
-    margin-left: 32%;
+    margin-left: 40%;
+}
+
+.logo {
+    width: 400px;
+    padding-top: 80px;
+    padding-bottom: 43px;
 }

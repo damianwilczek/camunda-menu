@@ -12,6 +12,7 @@
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
+        <script>var autoRefresh = '';</script>
     </head>
     <body onload="loadDashboard();">
         <section style="background:#efefe9;">
@@ -22,7 +23,7 @@
                             <ul class="nav nav-tabs" id="myTab">
                                 <div class="liner"></div>
                                 <li class="active"><a onclick="loadDashboard();" href="#dashboard" data-toggle="tab" title="Dashboard"><span class="round-tabs one"><i class="glyphicon glyphicon-home"></i></span></a></li>
-                                <li><a href="#response" data-toggle="tab" title="Response"><span class="round-tabs two"><i class="glyphicon glyphicon-heart"></i></span></a></li>
+                                <li><a href="#response" onclick="autoRefresh = setInterval(function(){ getSelected(); }, 2000);" data-toggle="tab" title="Response"><span class="round-tabs two"><i class="glyphicon glyphicon-heart"></i></span></a></li>
                                 <li><a href="#locations" onclick="getLocation()" data-toggle="tab" title="Locations"><span class="round-tabs three"><i class="glyphicon glyphicon-map-marker"></i></span> </a></li>
                                 <li><a href="#gerichte" onclick="getFoodLocations();" data-toggle="tab" title="Gerichte"><span class="round-tabs four"><i class="glyphicon glyphicon-apple"></i></span></a></li>
                                 <li><a href="#settings" onclick="getSettings();" data-toggle="tab" title="App settings"><span class="round-tabs five"><i class="glyphicon glyphicon-cog"></i></span></a></li>
@@ -50,7 +51,7 @@
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <h4 class="text-center">Teilnehmern geantwortet</h4>
-                                                <h3 style="font-size: 12em;color: dodgerblue;" class="head text-center">0<span id="dashboardAmount"></span></h3>
+                                                <h3 style="font-size: 12em;color: dodgerblue;" class="head text-center"><span id="countCustomers"></span><span id="dashboardAmount"></span></h3>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -81,25 +82,22 @@
                                 <div class="row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-8">
-                                        <ul class="list-group">
-                                            <li class="list-group-item borderless">
-                                                <span class="badge" style="background-color: dodgerblue;">3</span>
-                                                Pizza 1
-                                            </li>
+                                        <ul class="list-group" id="selectedFood">
 
-                                        <li class="list-group-item borderless">
-                                            <span class="badge" style="background-color: dodgerblue;">2</span>
-                                            Pizza 2
-                                        </li>
-
-                                        <li class="list-group-item borderless">
-                                            <span class="badge" style="background-color: dodgerblue;">6</span>
-                                            Pizza 3
-                                        </li>
                                         </ul>
                                     </div>
                                     <div class="col-md-2"></div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-md-4"></div>
+                                    <div class="col-md-4 text-center">
+                                        <button class="btn btn-danger" type="button" id="removevote" onclick="removeVotes()">Remove all votes!</button>
+                                    </div>
+                                    <div class="col-md-4"></div>
+
+                                </div>
+                                <div class="row"><br /> </div>
+
 
                             </div>
                             <div class="tab-pane fade" id="locations">
@@ -185,186 +183,52 @@
         </section>
 
         <script type="text/javascript">
-            // Your Client ID can be retrieved from your project in the Google
-            // Developer Console, https://console.developers.google.com
-            // fACk3MD03mYv9DTQTXT2A3qT
-            var CLIENT_ID = '434616858543-sk02cp7fpl9lsdhhkl91eqajfce55n87.apps.googleusercontent.com';
-
-            var SCOPES = ['https://www.googleapis.com/auth/drive']; /* http://stackoverflow.com/questions/32309136/google-drive-api-client-python-insufficient-permission-for-files-insert */
-
-            /**
-             * Check if current user has authorized this application.
-             */
-            function checkAuth() {
-                gapi.auth.authorize(
-                        {
-                            'client_id': CLIENT_ID,
-                            'scope': SCOPES.join(' '),
-                            'immediate': true
-                        }, handleAuthResult);
-            }
-
-            /**
-             * Handle response from authorization server.
-             *
-             * @param {Object} authResult Authorization result.
-             */
-            function handleAuthResult(authResult) {
-                var authorizeDiv = document.getElementById('authorize-div');
-                if (authResult && !authResult.error) {
-                    // Hide auth UI, then load client library.
-                    authorizeDiv.style.display = 'none';
-                    loadDriveApi();
-                } else {
-                    // Show auth UI, allowing the user to initiate authorization by
-                    // clicking authorize button.
-                    authorizeDiv.style.display = 'inline';
-                }
-            }
-
-            /**
-             * Initiate auth flow in response to user clicking authorize button.
-             *
-             * @param {Event} event Button click event.
-             */
-            function handleAuthClick(event) {
-                gapi.auth.authorize(
-                        {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
-                        handleAuthResult);
-                return false;
-            }
-
-            /**
-             * Load Drive API client library.
-             */
-            function loadDriveApi() {
-                gapi.client.load('drive', 'v3', listFiles);
-            }
-
-            /**
-             * Print files.
-             */
-            function listFiles() {
-                var request = gapi.client.drive.files.list({
-                    'pageSize': 10,
-                    'fields': "nextPageToken, files(id, name)"
-                });
-
-                request.execute(function(resp) {
-                    appendPre('Files:');
-                    var files = resp.files;
-                    if (files && files.length > 0) {
-                        for (var i = 0; i < files.length; i++) {
-                            var file = files[i];
-                            appendPre(file.name + ' (' + file.id + ')');
-
-                            console.log(resp);
-                        }
-                    } else {
-                        appendPre('No files found.');
-                    }
-                });
-            }
-
-            /**
-             * Append a pre element to the body containing the given message
-             * as its text node.
-             * https://gist.github.com/csusbdt/4525042
-             *
-             * @param {string} message Text to be placed in pre element.
-             */
-            function appendPre(message) {
-                var pre = document.getElementById('output');
-                var textContent = document.createTextNode(message + '\n');
-                pre.appendChild(textContent);
-            }
-
-            function uploadFile(evt) {
-                gapi.client.load('drive', 'v2', function() {
-                    insertFile();
-                });
-            }
-            /**
-             * Insert new file.
-             */
-            function insertFile() {
-                const boundary = '-------314159265358979323846264';
-                const delimiter = "\r\n--" + boundary + "\r\n";
-                const close_delim = "\r\n--" + boundary + "--";
-                var appState = {
-                    number: 12,
-                    text: 'hello'
-                };
-                var fileName = 'csusbdt-drive-example-app-state.txt';
-                var contentType = 'application/json';
-                var metadata = {
-                    'title': fileName,
-                    'mimeType': contentType
-                };
-                var base64Data = btoa(JSON.stringify(appState));
-                var multipartRequestBody =
-                        delimiter +
-                        'Content-Type: application/json\r\n\r\n' +
-                        JSON.stringify(metadata) +
-                        delimiter +
-                        'Content-Type: ' + contentType + '\r\n' +
-                        'Content-Transfer-Encoding: base64\r\n' +
-                        '\r\n' +
-                        base64Data +
-                        close_delim;
-                var request = gapi.client.request({
-                    'path': '/upload/drive/v2/files',
-                    'method': 'POST',
-                    'params': {'uploadType': 'multipart'},
-                    'headers': {
-                        'Content-Type': 'multipart/mixed; boundary="' + boundary + '"'
-                    },
-                    'body': multipartRequestBody});
-                request.execute(function(arg) {
-                    console.log(arg);
-                });
-            }
-
-            var JSONdata = null;
-
-            $.ajax({
-                type: "GET", url: "https://www.system-solution.it/test.php", success: function (msg) {
-                    if (msg != 'error') {
-                        var data = JSON.parse(msg);
-                        localStorage.setItem("data", JSON.stringify(data));
-                    }
-                }
-            });
-
-
             $(function(){
                 $('a[title]').tooltip();
             });
+
+            function refreshData() {
+                $.ajax({
+                    type: "GET", url: "https://www.system-solution.it/test.php", success: function (msg) {
+                        if (msg != 'error') {
+                            var data = JSON.parse(msg);
+                            localStorage.setItem("data", JSON.stringify(data));
+                        }
+                    }
+                });
+            }
 
             function setLocationOption(v){
                 var data = JSON.parse(localStorage.getItem("data"));
                 data.currentLocationId = v;
                 localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
                 loadDashboard();
             }
+
             function setMemberAmount(v){
                 var data = JSON.parse(localStorage.getItem("data"));
                 data.amount = v;
                 localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
                 loadDashboard();
             }
+
             function loadDashboard(){
+                clearInterval(autoRefresh);
+                refreshData();
                 var data = JSON.parse(localStorage.getItem("data"));
                 var location = (typeof data.Location[data.currentLocationId] !== 'undefined')?data.Location[data.currentLocationId].name:'<button onclick="getSettings();" data-toggle="tab"  class="btn btn-primary"><span class="glyphicon glyphicon-trash"></span> Set Location</button>';
                 var amount = data.amount !== null?data.amount:0;
 
                 document.getElementById('dashboardLocation').innerHTML = location;
                 document.getElementById('dashboardAmount').innerHTML = '<sub>/' + amount + '</sub>';
-
+                getSelected();
                 uploadData();
             }
 
             function getLocation(){
+                clearInterval(autoRefresh);
                 var data = JSON.parse(localStorage.getItem("data"));
                 var HTML = '';
                 $.each(data.Location, function( key, value) {
@@ -383,6 +247,7 @@
                 data.Location[id].name = value;
                 document.getElementById('newLocation').value = '';
                 localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
                 getLocation();
             }
 
@@ -402,10 +267,12 @@
                     }
                 });
                 localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
                 getLocation();
             }
 
             function getSettings(){
+                clearInterval(autoRefresh);
                 $('.nav-tabs a[href="#settings"]').tab('show');
                 var data = JSON.parse(localStorage.getItem("data"));
                 var HTML_Location = '<option selected disabled>Select location...</option>';
@@ -427,6 +294,7 @@
             }
 
             function getFoodLocations(){
+                clearInterval(autoRefresh);
                 var data = JSON.parse(localStorage.getItem("data"));
                 var HTML_Location = '<option selected disabled>First select location...</option>';
                 $.each(data.Location, function( key, value) {
@@ -457,6 +325,7 @@
                     }
                 });
                 localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
                 getFood(location);
             }
 
@@ -476,6 +345,7 @@
 
                 document.getElementById('newFood').value = '';
                 localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
                 getFood(location);
             }
             function uploadData() {
@@ -485,6 +355,35 @@
                         console.log(msg);
                     }
                 });
+            }
+
+            function getSelected() {
+                refreshData();
+                var data = JSON.parse(localStorage.getItem("data"));
+                var HTML = ''; var foodId = '';var countCustomers = 0;
+                $.each(data.selectedFood, function( key, value) {
+                        foodId = value.selected.replace('foodID_', '');
+                        $.each(data.Food, function( keyt, valuet) {
+                            if(valuet.id == foodId && data.currentLocationId == valuet.location){
+                                console.log(foodId + '/' + valuet.location);
+                                countCustomers++;
+                                HTML += '<li class="list-group-item borderless"><span class="badge" style="background-color: dodgerblue;">3</span>' + valuet.name + ' </li>';
+                            }
+                        });
+                });
+                document.getElementById('removevote').style.display = (countCustomers > 0) ? 'block' : 'none';
+                document.getElementById('selectedFood').innerHTML = HTML;
+                document.getElementById('countCustomers').innerHTML = countCustomers;
+
+            }
+
+            function removeVotes() {
+                var data = JSON.parse(localStorage.getItem("data"));
+                $.each(data.selectedFood, function( key, value) {
+                    delete data.selectedFood[key];
+                });
+                localStorage.setItem("data", JSON.stringify(data));
+                uploadData();
             }
         </script>
     </body>

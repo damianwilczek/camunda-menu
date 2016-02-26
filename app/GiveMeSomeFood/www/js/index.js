@@ -35,12 +35,20 @@ var app = {
     },
     getData: function(){
         $.ajax({
-            type: "GET", url: "https://www.system-solution.it/test.php", success: function (msg) {
+            type: "GET", url: "https://camunda.com/givemesomefood/index.php", success: function (msg) {
                 if (msg != 'error') {
                     var data = JSON.parse(msg);
                     localStorage.removeItem("data");
                     localStorage.setItem("data", JSON.stringify(data));
                 }
+            }
+        });
+    },
+    uploadData: function(){
+        var data = { action: "add", data: localStorage.getItem("data") };
+        $.ajax({
+            type: "POST", url: "https://camunda.com/givemesomefood/index.php", data: data, success: function (msg) {
+                console.log(msg);
             }
         });
     },
@@ -57,27 +65,29 @@ var app = {
 
         app.uploadData();
     },
-    uploadData: function(){
-        var data = { action: "add", data: localStorage.getItem("data") };
-        $.ajax({
-            type: "POST", url: "https://www.system-solution.it/test.php", data: data, success: function (msg) {
-                console.log(msg);
-            }
-        });
-    },
     getFood: function() {
         localStorage.removeItem('selectedFood');
         var data = JSON.parse(localStorage.getItem("data"));
-        var HTML = '';
+        var selectedLang = localStorage.getItem("lang");
+        var HTML = '';var count = 0;var alt = '';var dishName = '';
         $.each(data.Food, function( key, value) {
             if(value.location == data.currentLocationId) {
-                HTML += ' <tr onclick="app.selectFood(this.firstElementChild.lastElementChild.id)"><td class="left"><label id="foodID_'+ value.id +'"><img src="res/check-default.png" /></label></td><td class="right">' + value.name + '</td></tr>';
+                alt = (count%2)?'alt':'';
+                dishName = (selectedLang == 'EN')?value.nameEN:value.nameDE;
+                HTML += ' <tr class="' + alt + '" onclick="app.selectFood(this.firstElementChild.lastElementChild.id)"><td class="left"><label id="foodID_'+ value.id +'"><img src="res/check-default.png" /></label></td><td class="right">' + dishName + '</td></tr>';
+                count++;
             }
         });
+        var menuTitle = (selectedLang == 'EN')?'LUNCH MENU':'MITTAGSMENÜ';
+        var buttonTitle = (selectedLang == 'EN')?'CONFIRM CHOICE':'AUSWAHL BUCHEN';
+
+        document.getElementById('orderFood').innerHTML = buttonTitle;
         document.getElementById('foodList').innerHTML = HTML;
+        document.getElementById('showLocation').innerHTML = menuTitle + ' - ' + data.Location[data.currentLocationId].name;
     },
     selectFood: function (id) {
-       if (localStorage.getItem("selectedFood") !== null) {
+        app.initialize();
+        if (localStorage.getItem("selectedFood") !== null) {
 
             var foodSelected = localStorage.getItem('selectedFood');
 
@@ -88,7 +98,7 @@ var app = {
             oldElement.lastElementChild.setAttribute('src', "res/check-default.png");
             oldElement.parentElement.parentElement.lastElementChild.style.backgroundColor = '';
 
-       }
+        }
 
         var newElement = document.getElementById(id);
         var button = document.getElementById('orderFood');
@@ -122,6 +132,75 @@ var app = {
         $("#buttonDiv").css('top', 0);
         $('body').animate({scrollTop: 0}, 500);
 
+    },
+    setLanguage: function(lang){
+        var selectedLang = (typeof lang === 'undefined')?'DE':lang;
+        localStorage.setItem('lang', selectedLang);
+        app.getFood();
+    },
+    setTime: function(){
+            var data = JSON.parse(localStorage.getItem("data"));
+            var time = document.getElementById('time').value;
+            data.time = time;
+            document.getElementById('currentTime').innerHTML = time;
+            localStorage.setItem("data", JSON.stringify(data));
+            app.uploadData();
+    },
+    setMemberAmount: function (v){
+        var data = JSON.parse(localStorage.getItem("data"));
+        data.amount = v;
+        document.getElementById('currentAmount').innerHTML = v;
+        document.getElementById('Allcustomers').innerHTML = v;
+        localStorage.setItem("data", JSON.stringify(data));
+        app.uploadData();
+    },
+    moveOnMax: function (field, nextFieldID) {
+        if (field.value.length == 1) {
+            document.getElementById(nextFieldID).focus();
+        }
+        app.checkPin();
+    },
+    checkPin: function(){
+        if(document.getElementById('pin').value == '1234') {
+            document.getElementById('trainerAuth').style.display = 'none';
+            document.getElementById('trainerBody').style.display = 'block';
+            document.getElementById('trainerFooter').style.display = 'block';
+
+            var data = JSON.parse(localStorage.getItem("data"));
+
+            document.getElementById('time').value = data.time;
+            document.getElementById('currentTime').innerHTML = data.time;
+
+            i = 1;
+            HTML_Amount = '<option selected disabled>Anzahl der Teilnehmer...</option>';
+            while (i <= 12) {
+                var selected = (data.amount == i)?'selected':'';
+                HTML_Amount +=  '<option '+selected+' value="'+i+'">'+i+'</option>';
+                i++;
+            }
+            document.getElementById('MemberAmount').innerHTML = HTML_Amount;
+
+            document.getElementById('currentAmount').innerHTML = data.amount;
+            document.getElementById('Allcustomers').innerHTML = data.amount;
+
+            var customers = 0;
+            $.each(data.selectedFood, function( key, value) {
+                customers++;
+            });
+            document.getElementById('amount').innerHTML = customers;
+        }
+    },
+    closeTrainerSettings: function() {
+        document.getElementById('trainerAuth').style.display = 'block';
+        document.getElementById('trainerBody').style.display = 'none';
+        document.getElementById('trainerFooter').style.display = 'none';
+        document.getElementById('pin').value = '';
+    },
+    applyOrder: function(){
+        var data = JSON.parse(localStorage.getItem("data"));
+        data.done = true;
+        localStorage.setItem("data", JSON.stringify(data));
+        app.uploadData();
     }
 };
 

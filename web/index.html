@@ -12,9 +12,9 @@
         <script src="js/jquery.js"></script>
         <script src="js/bootstrap.min.js"></script>
         <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
-        <script>var autoRefresh = '';</script>
     </head>
-    <body onload="loadDashboard();">
+    <body id="mainPage"
+    ">
         <section style="background:#efefe9;">
             <div class="container">
                 <div class="row">
@@ -22,11 +22,19 @@
                         <div class="board-inner">
                             <ul class="nav nav-tabs" id="myTab">
                                 <div class="liner"></div>
-                                <li class="active"><a onclick="loadDashboard();" href="#dashboard" data-toggle="tab" title="Dashboard"><span class="round-tabs one"><i class="glyphicon glyphicon-home"></i></span></a></li>
-                                <li><a href="#response" onclick="autoRefresh = setInterval(function(){ getSelected(); }, 2000);" data-toggle="tab" title="Response"><span class="round-tabs two"><i class="glyphicon glyphicon-heart"></i></span></a></li>
-                                <li><a href="#locations" onclick="getLocation()" data-toggle="tab" title="Locations"><span class="round-tabs three"><i class="glyphicon glyphicon-map-marker"></i></span> </a></li>
-                                <li><a href="#gerichte" onclick="getFoodLocations();" data-toggle="tab" title="Gerichte"><span class="round-tabs four"><i class="glyphicon glyphicon-apple"></i></span></a></li>
-                                <li><a href="#settings" onclick="getSettings();" data-toggle="tab" title="App settings"><span class="round-tabs five"><i class="glyphicon glyphicon-cog"></i></span></a></li>
+                                <li class="active"><a id="menuDashboard" href="#dashboard" data-toggle="tab"
+                                                      title="Dashboard"><span class="round-tabs one"><i
+                                        class="glyphicon glyphicon-home"></i></span></a></li>
+                                <li><a id="menuResponse" href="#response" data-toggle="tab" title="Response"><span
+                                        class="round-tabs two"><i class="glyphicon glyphicon-heart"></i></span></a></li>
+                                <li><a id="menuLocations" href="#locations" data-toggle="tab" title="Locations"><span
+                                        class="round-tabs three"><i class="glyphicon glyphicon-map-marker"></i></span>
+                                </a></li>
+                                <li><a id="menuDishes" href="#gerichte" data-toggle="tab" title="Gerichte"><span
+                                        class="round-tabs four"><i class="glyphicon glyphicon-apple"></i></span></a>
+                                </li>
+                                <li><a id="menuSettings" href="#settings" data-toggle="tab" title="App settings"><span
+                                        class="round-tabs five"><i class="glyphicon glyphicon-cog"></i></span></a></li>
                             </ul>
                         </div>
                         <div class="tab-content">
@@ -63,18 +71,6 @@
                                     </div>
 
                                 </div>
-                                <div class="row" id="authorize-div" style="display: none">
-                                    <div class="col-md-4"></div>
-                                    <div class="col-md-4">
-                                        <h3 class="head text-center">Authorize access to Drive API</h3>
-                                        <!--Button for the user to click to initiate auth sequence -->
-                                        <button class="btn btn-warning" type="button" id="authorize-button" onclick="handleAuthClick(event)">
-                                            Authorize
-                                        </button>
-                                    </div>
-                                    <div class="col-md-4"></div>
-                                </div>
-
                             </div>
                             <div class="tab-pane fade" id="response">
                                 <h3 class="head text-center">Ausgewaehlte Gerichte</h3>
@@ -91,7 +87,8 @@
                                 <div class="row">
                                     <div class="col-md-4"></div>
                                     <div class="col-md-4 text-center">
-                                        <button class="btn btn-danger" type="button" id="removevote" onclick="removeVotes()">Remove all votes!</button>
+                                        <button class="btn btn-danger" type="button" id="removevote">Remove all votes!
+                                        </button>
                                     </div>
                                     <div class="col-md-4"></div>
 
@@ -115,9 +112,12 @@
                                     <div class="col-md-1"></div>
                                     <div class="col-md-10">
                                         <div class="input-group">
-                                            <span class="input-group-addon" id="location-prefix">New location name:</span>
+                                            <span class="input-group-addon">New location name:</span>
                                             <input type="text" class="form-control" id="newLocation" aria-describedby="location-prefix" placeholder="Type the new location name">
-                                             <span class="input-group-btn"><button onclick="setLocation(document.getElementById('newLocation').value)"  class="btn btn-success" type="button">Add!</button></span>
+                                            <span class="input-group-btn"><button id="setLocation"
+                                                                                  class="btn btn-success" type="button">
+                                                Add!
+                                            </button></span>
                                         </div> <br /><br /><br />
                                     </div>
                                     <div class="col-md-1"></div>
@@ -129,7 +129,7 @@
                                     <div class="col-md-1"></div>
                                     <div class="col-md-10">
                                         <div class="form-group">
-                                            <select class="form-control" id="foodLocationOptions" onchange="getFood(this.value);"></select>
+                                            <select class="form-control" id="foodLocationOptions"></select>
                                         </div>
                                     </div>
                                     <div class="col-md-1"></div>
@@ -149,9 +149,17 @@
                                         <div class="col-md-10">
                                             <div class="input-group">
                                                 <span class="input-group-addon" id="location-prefix">Gericht hinzufügen:</span>
-                                                <input onchange="copyName(this.id, 'newFoodEN');" type="text" class="form-control" id="newFoodDE" placeholder="Dish name in German" aria-describedby="location-prefix">
-                                                <input onchange="copyName(this.id, 'newFoodDE');" type="text" class="form-control" id="newFoodEN" placeholder="Dish name in English" aria-describedby="location-prefix">
-                                                <span class="input-group-btn"><button onclick="setFood(document.getElementById('newFoodDE').value, document.getElementById('newFoodEN').value, document.getElementById('foodLocationOptions').value)" class="btn btn-success" type="button" style="height: 68px;">Add!</button></span>
+                                                <input type="text" class="form-control" id="newFoodDE"
+                                                       placeholder="Dish name in German"
+                                                       aria-describedby="location-prefix">
+                                                <input type="text" class="form-control" id="newFoodEN"
+                                                       placeholder="Dish name in English"
+                                                       aria-describedby="location-prefix">
+                                                <span class="input-group-btn"><button id="addFoodButton"
+                                                                                      class="btn btn-success"
+                                                                                      type="button"
+                                                                                      style="height: 68px;">Add!
+                                                </button></span>
                                             </div> <br /><br /><br />
                                         </div>
                                         <div class="col-md-1"></div>
@@ -164,11 +172,11 @@
                                     <div class="col-md-1"></div>
                                     <div class="col-md-10">
                                         <div class="form-group">
-                                            <select class="form-control" id="locationOptions" onchange="setLocationOption(this.value)">
+                                            <select class="form-control" id="locationOptions">
 
                                             </select>
                                             <br />
-                                            <select class="form-control" id="MemberAmount" onchange="setMemberAmount(this.value)"></select>
+                                            <select class="form-control" id="MemberAmount"></select>
                                         </div>
                                     </div>
                                     <div class="col-md-1"></div>
@@ -177,35 +185,20 @@
                                 <div class="row">
                                     <div class="col-md-1"></div>
                                     <div class="col-md-3">
-                                        <button onclick="console.save()" class="btn btn-info">Backup Data</button>
+                                        <button id="backupData" class="btn btn-info">Backup Data</button>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="input-group" style="display: inline-flex;">
                                             <div>
-                                                <button onclick="$('#backupFile').click();" id="button" type="button" class="btn btn-info">Chose backup file</button>
+                                                <button id="choseBackup" type="button" class="btn btn-info">Chose backup
+                                                    file
+                                                </button>
                                             </div>
                                             <input type="text" id="backupName" class="form-control" disabled="disabled">
                                             <input type="file" id="backupFile" style="display: none">
-                                            <script>
-                                                var control = document.getElementById("backupFile");
-                                                control.addEventListener("change", function(event) {
-
-                                                    // When the control has changed, there are new files
-
-                                                    var i = 0,
-                                                            files = control.files,
-                                                            len = files.length;
-
-                                                    for (; i < len; i++) {
-                                                        console.log("Filename: " + files[i].name);
-                                                        console.log("Type: " + files[i].type);
-                                                        console.log("Size: " + files[i].size + " bytes");
-                                                        document.getElementById('backupName').value = files[i].name;
-                                                    }
-
-                                                }, false);
-                                            </script>
-                                            <span class="input-group-btn"><button onclick="handleFile();" class="btn btn-info">Restore</button></span>
+                                            <span class="input-group-btn"><button id="restore" class="btn btn-info">
+                                                Restore
+                                            </button></span>
                                         </div>
                                     </div>
                                     <div class="col-md-2"></div>
@@ -220,270 +213,6 @@
             </div>
             <pre id="output"></pre>
         </section>
-
-        <script type="text/javascript">
-            $(function(){
-                $('a[title]').tooltip();
-            });
-
-            function refreshData() {
-                $.ajax({
-                    type: "GET", url: "//camunda.com/givemesomefood/index.php", success: function (msg) {
-                        if (msg != 'error') {
-                            var data = JSON.parse(msg);
-                            localStorage.setItem("data", JSON.stringify(data));
-                        }
-                    }
-                });
-            }
-
-            function uploadData() {
-                var data = { action: "add", data: localStorage.getItem("data") };
-                $.ajax({
-                    type: "POST", url: "//camunda.com/givemesomefood/index.php", data: data
-                });
-            }
-
-            function setLocationOption(v){
-                var data = JSON.parse(localStorage.getItem("data"));
-                data.currentLocationId = v;
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                loadDashboard();
-            }
-
-            function setMemberAmount(v){
-                var data = JSON.parse(localStorage.getItem("data"));
-                data.amount = v;
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                loadDashboard();
-            }
-
-            function loadDashboard(){
-                clearInterval(autoRefresh);
-                refreshData();
-                var data = JSON.parse(localStorage.getItem("data"));
-                var location = (typeof data.Location[data.currentLocationId] !== 'undefined')?data.Location[data.currentLocationId].name:'<button onclick="getSettings();" data-toggle="tab"  class="btn btn-primary"><span class="glyphicon glyphicon-trash"></span> Set Location</button>';
-                var amount = data.amount !== null?data.amount:0;
-                document.getElementById('countCustomers').parentElement.style.color = (data.done == true)?'greenyellow':'dodgerblue';
-                document.getElementById('time').innerHTML = data.time;
-                document.getElementById('dashboardLocation').innerHTML = location;
-                document.getElementById('dashboardAmount').innerHTML = '<sub>/' + amount + '</sub>';
-                autoRefresh = setInterval(function(){ getSelected(); }, 2000);
-                uploadData();
-            }
-
-            function getLocation(){
-                clearInterval(autoRefresh);
-                var data = JSON.parse(localStorage.getItem("data"));
-                var HTML = '';
-                $.each(data.Location, function( key, value) {
-                    HTML +=  '<li class="list-group-item borderless"><p>' + value.name + ' <button type="button" onclick="removeLocation('+key+')" class="btn btn-danger" style="float: right;"><span class="glyphicon glyphicon-trash"></span></button></p></li>';
-                });
-                document.getElementById('showLocations').innerHTML = HTML;
-            }
-
-            function setLocation(value){
-                var data = JSON.parse(localStorage.getItem("data"));
-                var id = 0;
-                $.each(data.Location, function( key ) {
-                   id = parseInt(key) + 1;
-                })
-                data.Location[id] = new Object();
-                data.Location[id].name = value;
-                document.getElementById('newLocation').value = '';
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                getLocation();
-            }
-
-            function removeLocation(id){
-                var data = JSON.parse(localStorage.getItem("data"));
-                $.each(data.Location, function( key ) {
-                    if(id == key) {
-                        delete data.Location[key];
-                    }
-                });
-                if(data.currentLocationId == id) {
-                    setLocationOption(0);
-                }
-                $.each(data.Food, function( key, value) {
-                    if(value.location == id) {
-                        delete data.Food[key];
-                    }
-                });
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                getLocation();
-            }
-
-            function getSettings(){
-                clearInterval(autoRefresh);
-                $('.nav-tabs a[href="#settings"]').tab('show');
-                var data = JSON.parse(localStorage.getItem("data"));
-                var HTML_Location = '<option selected disabled>Select location...</option>';
-                $.each(data.Location, function( key, value) {
-                    var selected = (data.currentLocationId == key)?'selected':'';
-                    HTML_Location +=  '<option '+ selected +' value="'+key+'">' + value.name +'</option>';
-                });
-                i = 1;
-                HTML_Amount = '<option selected disabled>Anzahl der Teilnehmer...</option>';
-                while (i <= 12) {
-                    var selected = (data.amount == i)?'selected':'';
-                    HTML_Amount +=  '<option '+selected+' value="'+i+'">'+i+'</option>';
-                    i++;
-                }
-
-                document.getElementById('locationOptions').innerHTML = HTML_Location;
-                document.getElementById('MemberAmount').innerHTML = HTML_Amount;
-
-            }
-
-            function getFoodLocations(){
-                clearInterval(autoRefresh);
-                var data = JSON.parse(localStorage.getItem("data"));
-                var HTML_Location = '<option selected disabled>First select location...</option>';
-                $.each(data.Location, function( key, value) {
-                    HTML_Location +=  '<option value="'+key+'">' + value.name +'</option>';
-                });
-                document.getElementById('foodLocationOptions').innerHTML = HTML_Location;
-                document.getElementById('FoodList').innerHTML = '';
-                document.getElementById('addfoodForm').style.display = 'none';
-            }
-
-            function getFood(id) {
-                var data = JSON.parse(localStorage.getItem("data"));
-                var HTML = '';
-                $.each(data.Food, function( key, value) {
-                    if(value.location == parseInt(id)) {
-                        HTML += '<li class="list-group-item borderless"><p>DE: '+value.nameDE+' <br />EN: '+ value.nameEN +'<button onclick="removeFood('+key+', '+value.location+');" type="button" class="btn btn-danger" style="float: right;margin-top: -15px;"><span class="glyphicon glyphicon-trash"></span></button></p></li>';
-                    }
-                });
-                document.getElementById('addfoodForm').style.display = 'block';
-                document.getElementById('FoodList').innerHTML = HTML;
-            }
-
-            function removeFood(id, location){
-                var data = JSON.parse(localStorage.getItem("data"));
-                $.each(data.Food, function( key ) {
-                    if(id == key) {
-                        delete data.Food[key]
-                    }
-                });
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                getFood(location);
-            }
-
-            function setFood(nameDE, nameEN, location){
-                var data = JSON.parse(localStorage.getItem("data"));
-                var id = 0, sumId = 1;
-
-                    $.each(data.Food, function (key, value) {
-                        if (value.location == parseInt(location)) {
-                            id = parseInt(key) + 1;
-                        }
-                        sumId = parseInt(key) + 1;
-                    });
-
-                data.Food[sumId] = new Object();
-                data.Food[sumId].nameDE = nameDE;
-                data.Food[sumId].nameEN = nameEN;
-                data.Food[sumId].id = id;
-                data.Food[sumId].location = location;
-
-                document.getElementById('newFoodDE').value = '';
-                document.getElementById('newFoodEN').value = '';
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                getFood(location);
-            }
-
-            function getSelected() {
-                refreshData();
-                var data = JSON.parse(localStorage.getItem("data"));
-                var HTML = ''; var foodId = '';var countCustomers = 0;
-                $.each(data.selectedFood, function( key, value) {
-                        foodId = value.selected.replace('foodID_', '');
-                        $.each(data.Food, function( keyt, valuet) {
-                            if(valuet.id == foodId && data.currentLocationId == valuet.location){
-                                countCustomers++;
-                                HTML += '<li class="list-group-item borderless"><span class="badge" style="background-color: dodgerblue;">3</span>' + valuet.nameDE + ' </li>';
-                            }
-                        });
-                });
-                document.getElementById('removevote').style.display = (countCustomers > 0) ? 'block' : 'none';
-                document.getElementById('selectedFood').innerHTML = HTML;
-                document.getElementById('countCustomers').innerHTML = countCustomers;
-
-            }
-
-            function removeVotes() {
-                clearInterval(autoRefresh);
-                var data = JSON.parse(localStorage.getItem("data"));
-                $.each(data.selectedFood, function( key, value) {
-                    delete data.selectedFood[key];
-                });
-                data.amount = 0;
-                data.time = '00:00';
-                data.done = false;
-                localStorage.setItem("data", JSON.stringify(data));
-                uploadData();
-                autoRefresh = setInterval(function(){ getSelected(); }, 2000);
-            }
-
-            function copyName(inputID, outputID){
-                var inValue = document.getElementById(inputID).value;
-                var outValue = document.getElementById(outputID).value;
-
-                if(outValue.length == 0){
-                    document.getElementById(outputID).value = inValue;
-                }
-
-
-            }
-
-            (function(console){
-
-                console.save = function(filename){
-                    var data = JSON.parse(localStorage.getItem("data"));
-                    if(!filename) filename = 'giveMeSomeFood_' + new Date().toJSON().slice(0,10) + '.json'
-
-                    if(typeof data === "object"){
-                        data = JSON.stringify(data, undefined, 4)
-                    }
-
-                    var blob = new Blob([data], {type: 'text/json'}),
-                            e    = document.createEvent('MouseEvents'),
-                            a    = document.createElement('a')
-
-                    a.download = filename
-                    a.href = window.URL.createObjectURL(blob)
-                    a.dataset.downloadurl =  ['text/json', a.download, a.href].join(':')
-                    e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
-                    a.dispatchEvent(e)
-                }
-            })(console)
-
-            function handleFile() {
-                var file = document.getElementById('backupFile').files[0];
-                var reader = new FileReader();
-
-                reader.onload = (function(theFile) {
-                    return function(e) {
-                        // Render thumbnail.
-                        var data = e.target.result;
-                        localStorage.setItem("data", data);
-                        console.log(data);
-                    };
-                })(file);
-
-                // Read in the image file as a data URL.
-                reader.readAsText(file);
-                uploadData();
-                location.reload();
-            }
-        </script>
+    <script language="JavaScript" src="js/app.js"></script>
     </body>
 </html>

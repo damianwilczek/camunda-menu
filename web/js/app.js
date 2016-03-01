@@ -106,6 +106,7 @@ var web = {
     },
     location: {
         get: function () {
+            clearInterval(web.interval);
             var HTML = '';
             $.each(web.data.Location, function (key, value) {
                 HTML += '<li class="list-group-item borderless"><p>' + value.name + ' <button type="button" onclick="web.location.remove(' + key + ')" class="btn btn-danger" style="float: right;"><span class="glyphicon glyphicon-trash"></span></button></p></li>';
@@ -153,6 +154,7 @@ var web = {
     },
     settings: {
         get: function () {
+            clearInterval(web.interval);
             $('.nav-tabs a[href="#settings"]').tab('show');
             var HTML_Location = '<option selected disabled>Select location...</option>';
             $.each(web.data.Location, function (key, value) {
@@ -184,17 +186,18 @@ var web = {
     },
     food: {
         get: function (id) {
+            clearInterval(web.interval);
             var HTML = '';
             $.each(web.data.Food, function (key, value) {
                 if (value.location == parseInt(id)) {
-                    HTML += '<li class="list-group-item borderless"><p>DE: ' + value.nameDE + ' <br />EN: ' + value.nameEN + '<button onclick="web.food.remove(' + key + ', ' + value.location + ');" type="button" class="btn btn-danger" style="float: right;margin-top: -15px;"><span class="glyphicon glyphicon-trash"></span></button></p></li>';
+                    HTML += '<li id="foodEntry_'+ key +'" class="list-group-item borderless"><p>DE: ' + value.nameDE + ' <br />EN: ' + value.nameEN + '<button onclick="web.food.remove(' + key + ', ' + value.location + ');" type="button" class="btn btn-danger" style="float: right;margin-top: -15px;"><span class="glyphicon glyphicon-trash"></span></button><button onclick="web.food.edit(' + key + ');" type="button" class="btn btn-warning" style="float: right;margin-top: -15px;margin-right: 10px;"><span class="glyphicon glyphicon-pencil"></span></button></p></li>';
                 }
             });
             web.func.getId('addfoodForm').style.display = 'block';
             web.func.getId('FoodList').innerHTML = HTML;
         },
         set: function (nameDE, nameEN, location) {
-            var id = 0, sumId = 1;
+            var id = 1, sumId = 1;
 
             $.each(web.data.Food, function (key, value) {
                 if (value.location == parseInt(location)) {
@@ -213,6 +216,26 @@ var web = {
             web.func.getId('newFoodEN').value = '';
             this.get(location);
             web.content.upload();
+        },
+        edit: function(key) {
+            var data = web.data.Food[key];
+            web.func.getId('foodEntry_'+ key).innerHTML = '<div class="input-group"><input type="text" class="form-control" id="foodEditDE_'+ data.id +'" placeholder="Dish name in German" value="' + data.nameDE + '" aria-describedby="location-prefix">' +
+                '<input type="text" class="form-control" id="foodEditEN_'+ data.id +'" placeholder="Dish name in English" value="' + data.nameEN + '" aria-describedby="location-prefix">' +
+                '<span class="input-group-btn"><button onclick="web.food.save(' + key + ');" class="btn btn-success" type="button" style="height: 68px;">Save!</button></span></div>';
+        },
+        save: function (key){
+            var data = web.data.Food[key];
+            var nameDE = web.func.getVal('foodEditDE_'+ data.id);
+            var nameEN = web.func.getVal('foodEditEN_'+ data.id);
+            var previousNameDE = data.nameDE;
+            var previousNameEN = data.nameEN;
+
+            web.data.Food[key].nameDE = nameDE;
+            web.data.Food[key].nameEN = nameEN;
+
+            web.func.getId('foodEntry_'+ key).innerHTML = '<p>DE: ' + web.data.Food[key].nameDE + ' <br />EN: ' + web.data.Food[key].nameEN + '<button onclick="web.food.remove(' + key + ', ' + web.data.Food[key].location + ');" type="button" class="btn btn-danger" style="float: right;margin-top: -15px;"><span class="glyphicon glyphicon-trash"></span></button><button onclick="web.food.edit(' + key + ');" type="button" class="btn btn-warning" style="float: right;margin-top: -15px;margin-right: 10px;"><span class="glyphicon glyphicon-pencil"></span></button></p>';
+            console.log(previousNameDE+'/'+nameDE);
+            if(previousNameDE != nameDE || previousNameEN != nameEN) web.content.upload();
         },
         remove: function (id, location) {
             $.each(web.data.Food, function (key) {

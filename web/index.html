@@ -13,15 +13,13 @@
         <script src="js/bootstrap.min.js"></script>
         <script src="https://apis.google.com/js/client.js?onload=checkAuth"></script>
     </head>
-    <body id="mainPage"
-    ">
+    <body id="mainPage">
         <section style="background:#efefe9;">
             <div class="container">
                 <div class="row">
                     <div class="board">
                         <div class="board-inner">
                             <ul class="nav nav-tabs" id="myTab">
-                                <div class="liner"></div>
                                 <li class="active"><a id="menuDashboard" href="#dashboard" data-toggle="tab"
                                                       title="Dashboard"><span class="round-tabs one"><i
                                         class="glyphicon glyphicon-home"></i></span></a></li>
@@ -129,7 +127,7 @@
                                     <div class="col-md-1"></div>
                                     <div class="col-md-10">
                                         <div class="form-group">
-                                            <select class="form-control" id="foodLocationOptions"></select>
+                                            <select title="Locations" class="form-control" id="foodLocationOptions"></select>
                                         </div>
                                     </div>
                                     <div class="col-md-1"></div>
@@ -172,11 +170,11 @@
                                     <div class="col-md-1"></div>
                                     <div class="col-md-10">
                                         <div class="form-group">
-                                            <select class="form-control" id="locationOptions">
+                                            <select title="Locations" class="form-control" id="locationOptions">
 
                                             </select>
                                             <br />
-                                            <select class="form-control" id="MemberAmount"></select>
+                                            <select title="Member Amount" class="form-control" id="MemberAmount"></select>
                                         </div>
                                     </div>
                                     <div class="col-md-1"></div>
@@ -194,7 +192,7 @@
                                                     file
                                                 </button>
                                             </div>
-                                            <input type="text" id="backupName" class="form-control" disabled="disabled">
+                                            <input type="text" title="File name" id="backupName" class="form-control" disabled="disabled">
                                             <input type="file" id="backupFile" style="display: none">
                                             <span class="input-group-btn"><button id="restore" class="btn btn-info">
                                                 Restore
@@ -211,7 +209,6 @@
                     </div>
                 </div>
             </div>
-            <pre id="output"></pre>
         </section>
     <script language="JavaScript" src="js/app.js"></script>
     </body>

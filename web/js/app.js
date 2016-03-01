@@ -34,8 +34,8 @@ var web = {
         this.func.getId('addFoodButton').addEventListener('click', function () {
             web.food.set(web.func.getVal('newFoodDE'), web.func.getVal('newFoodEN'), web.func.getVal('foodLocationOptions'))
         });
-        this.func.getId('backupData').addEventListener('click', this.file.save, false);
-        this.func.getId('restore').addEventListener('click', this.file.open, false);
+        this.func.getId('backupData').addEventListener('click', this.settings.file.save, false);
+        this.func.getId('restore').addEventListener('click', this.settings.file.open, false);
         this.func.getId('choseBackup').addEventListener('click', function () {
             web.func.getId('backupFile').click()
         });
@@ -54,7 +54,8 @@ var web = {
         this.func.getId('MemberAmount').addEventListener('change', function () {
             web.settings.setMemberAmount(web.func.getVal('MemberAmount'))
         });
-        this.func.getId('backupFile').addEventListener('change', this.file.getName, false);
+        this.func.getId('backupFile').addEventListener('change', this.settings.file.getName, false);
+        this.func.getId('imgtoggle').addEventListener('change', this.settings.toggleImages, false);
     },
     func: {
         getId: function (id) {
@@ -83,6 +84,9 @@ var web = {
             web.interval = setInterval(function () {
                 web.content.download();
             }, 5000);
+        },
+        checked: function(id){
+            return this.getId(id).checked;
         }
     },
     content: {
@@ -153,6 +157,35 @@ var web = {
         }
     },
     settings: {
+        file: {
+            save: function () {
+                var blob = new Blob([JSON.stringify(web.data, undefined, 4)], {type: 'text/json'}),
+                    e = document.createEvent('MouseEvents'),
+                    a = document.createElement('a');
+
+                a.download = 'giveMeSomeFood_' + new Date().toJSON().slice(0, 10) + '.json';
+                a.href = window.URL.createObjectURL(blob);
+                a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+                e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            },
+            open: function () {
+                var file = web.func.getId('backupFile').files[0];
+                var reader = new FileReader();
+                reader.onload = (function () {
+                    return function (e) {
+                        web.data = e.target.result;
+                        web.content.upload();
+                    };
+                })(file);
+
+                reader.readAsText(file);
+                location.reload();
+            },
+            getName: function () {
+                web.func.setVal('backupName', web.func.getId('backupFile').files[0].name);
+            }
+        },
         get: function () {
             clearInterval(web.interval);
             $('.nav-tabs a[href="#settings"]').tab('show');
@@ -182,6 +215,9 @@ var web = {
             web.data.amount = v;
             web.dashboard.get();
             web.content.upload();
+        },
+        toggleImages: function(){
+            web.data.images = (web.func.checked('imgtoggle'))?true:false;
         }
     },
     food: {
@@ -283,35 +319,6 @@ var web = {
             web.data.done = false;
             web.response.get();
             web.content.upload();
-        }
-    },
-    file: {
-        save: function () {
-            var blob = new Blob([JSON.stringify(web.data, undefined, 4)], {type: 'text/json'}),
-                e = document.createEvent('MouseEvents'),
-                a = document.createElement('a');
-
-            a.download = 'giveMeSomeFood_' + new Date().toJSON().slice(0, 10) + '.json';
-            a.href = window.URL.createObjectURL(blob);
-            a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-            e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-            a.dispatchEvent(e);
-        },
-        open: function () {
-            var file = web.func.getId('backupFile').files[0];
-            var reader = new FileReader();
-            reader.onload = (function () {
-                return function (e) {
-                    web.data = e.target.result;
-                    web.content.upload();
-                };
-            })(file);
-
-            reader.readAsText(file);
-            location.reload();
-        },
-        getName: function () {
-            web.func.setVal('backupName', web.func.getId('backupFile').files[0].name);
         }
     }
 };

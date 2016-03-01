@@ -182,24 +182,32 @@
                                 <div class="clearfix"></div>
                                 <div class="row">
                                     <div class="col-md-1"></div>
-                                    <div class="col-md-3">
-                                        <button id="backupData" class="btn btn-info">Backup Data</button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="input-group" style="display: inline-flex;">
-                                            <div>
-                                                <button id="choseBackup" type="button" class="btn btn-info">Chose backup
-                                                    file
-                                                </button>
+
+                                    <div class="col-md-10">
+                                        <div class="form-group">
+                                            <button id="backupData" class="btn btn-info">Backup Data</button>
+                                            <div class="input-group" style="display: inline-flex;width:75%;">
+                                                <button id="choseBackup" type="button" class="btn btn-info">Choose backup file</button>
+                                                <input type="text" title="File name" id="backupName" class="form-control" disabled="disabled">
+                                                <input type="file" id="backupFile" style="display: none">
+                                                <span class="input-group-btn"><button id="restore" class="btn btn-info">
+                                                    Restore
+                                                </button></span>
                                             </div>
-                                            <input type="text" title="File name" id="backupName" class="form-control" disabled="disabled">
-                                            <input type="file" id="backupFile" style="display: none">
-                                            <span class="input-group-btn"><button id="restore" class="btn btn-info">
-                                                Restore
-                                            </button></span>
                                         </div>
                                     </div>
-                                    <div class="col-md-2"></div>
+                                    <div class="col-md-1"></div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="row">
+                                    <div class="col-md-1"></div>
+
+                                    <div class="col-md-10">
+                                        <div class="checkbox">
+                                            <label><input id="imgtoggle" type="checkbox" value="">Add images to Menu</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1"></div>
                                 </div>
                                 <br />
                             </div>
